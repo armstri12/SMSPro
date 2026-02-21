@@ -6,5 +6,9 @@ Common entity contracts shared across backend services and the web frontend.
 - `Site`
 - `User`
 - `Obligation`
+- `ProgramTemplate`
+- `ProgramDocument`
+- `ProgramRevision`
+- `ApprovalStep`
 - `Incident`
 - `CorrectiveAction`

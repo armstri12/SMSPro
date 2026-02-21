@@ -1,3 +1,4 @@
+---
 openapi: 3.1.0
 info:
   title: SMSPro Phase 1 API Contracts
@@ -6,107 +7,121 @@ info:
     API contracts for MVP scope: intake, applicability, obligations, programs,
     incident/corrective actions, and dashboard summary/export.
 servers:
-  - url: https://api.smspro.local
+- url: https://api.smspro.local
 paths:
-  /v1/intake/sessions:
+  "/v1/intake/sessions":
     post:
       summary: Start questionnaire session as a draft snapshot version.
-      tags: [Intake]
+      tags:
+      - Intake
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StartQuestionnaireSessionRequest'
+              "$ref": "#/components/schemas/StartQuestionnaireSessionRequest"
       responses:
         '201':
           description: Session started
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/QuestionnaireSession'
-  /v1/intake/sessions/{snapshotId}/answers:
+                "$ref": "#/components/schemas/QuestionnaireSession"
+  "/v1/intake/sessions/{snapshotId}/answers":
     post:
       summary: Submit answer batch and re-evaluate deterministic branching.
-      tags: [Intake]
+      tags:
+      - Intake
       parameters:
-        - in: path
-          name: snapshotId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: snapshotId
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubmitAnswerBatchRequest'
+              "$ref": "#/components/schemas/SubmitAnswerBatchRequest"
       responses:
         '200':
           description: Updated session state
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/QuestionnaireSession'
-  /v1/intake/snapshots/{snapshotId}/finalize:
+                "$ref": "#/components/schemas/QuestionnaireSession"
+  "/v1/intake/snapshots/{snapshotId}/finalize":
     post:
       summary: Finalize immutable intake snapshot and profile explainability.
-      tags: [Intake]
+      tags:
+      - Intake
       parameters:
-        - in: path
-          name: snapshotId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: snapshotId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Snapshot finalized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IntakeSnapshot'
-  /v1/intake/snapshots/{snapshotId}:
+                "$ref": "#/components/schemas/IntakeSnapshot"
+  "/v1/intake/snapshots/{snapshotId}":
     get:
       summary: Get a historical intake snapshot with deterministic path explanation.
-      tags: [Intake]
+      tags:
+      - Intake
       parameters:
-        - in: path
-          name: snapshotId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: snapshotId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Snapshot payload and explanation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IntakeSnapshotHistory'
-  /v1/regulatory/applicability/evaluate:
+                "$ref": "#/components/schemas/IntakeSnapshotHistory"
+  "/v1/regulatory/applicability/evaluate":
     post:
       summary: Evaluate applicability and produce explainable obligation matches.
-      tags: [Regulatory]
+      tags:
+      - Regulatory
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApplicabilityEvaluationRequest'
+              "$ref": "#/components/schemas/ApplicabilityEvaluationRequest"
       responses:
         '200':
           description: Applicability result
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicabilityEvaluationResult'
-  /v1/regulatory/obligations:
+                "$ref": "#/components/schemas/ApplicabilityEvaluationResult"
+  "/v1/regulatory/obligations":
     get:
       summary: Query obligation registry.
-      tags: [Regulatory]
+      tags:
+      - Regulatory
       parameters:
-        - in: query
-          name: jurisdiction
-          schema: { type: string }
-        - in: query
-          name: search
-          schema: { type: string }
+      - in: query
+        name: jurisdiction
+        schema:
+          type: string
+      - in: query
+        name: search
+        schema:
+          type: string
       responses:
         '200':
           description: Obligation list
@@ -117,45 +132,56 @@ paths:
                 properties:
                   items:
                     type: array
-                    items: { $ref: '#/components/schemas/Obligation' }
-  /v1/regulatory/obligations/{obligationId}:
+                    items:
+                      "$ref": "#/components/schemas/Obligation"
+  "/v1/regulatory/obligations/{obligationId}":
     get:
       summary: Fetch obligation detail with current version and citations.
-      tags: [Regulatory]
+      tags:
+      - Regulatory
       parameters:
-        - in: path
-          name: obligationId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: obligationId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Obligation detail
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Obligation' }
-  /v1/programs/generate:
+              schema:
+                "$ref": "#/components/schemas/Obligation"
+  "/v1/programs/generate":
     post:
       summary: Generate top 5 foundational programs from obligations.
-      tags: [Programs]
+      tags:
+      - Programs
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/GenerateProgramsRequest' }
+            schema:
+              "$ref": "#/components/schemas/GenerateProgramsRequest"
       responses:
         '202':
           description: Program generation accepted
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ProgramGenerationJob' }
-  /v1/programs/documents:
+              schema:
+                "$ref": "#/components/schemas/ProgramGenerationJob"
+  "/v1/programs/documents":
     get:
       summary: List generated program documents.
-      tags: [Programs]
+      tags:
+      - Programs
       parameters:
-        - in: query
-          name: siteId
-          schema: { type: string, format: uuid }
+      - in: query
+        name: siteId
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Program documents
@@ -166,16 +192,20 @@ paths:
                 properties:
                   items:
                     type: array
-                    items: { $ref: '#/components/schemas/ProgramDocument' }
-  /v1/operations/incidents:
+                    items:
+                      "$ref": "#/components/schemas/ProgramDocument"
+  "/v1/operations/incidents":
     get:
       summary: List incidents for a site.
-      tags: [Operations]
+      tags:
+      - Operations
       parameters:
-        - in: query
-          name: siteId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: query
+        name: siteId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Incident list
@@ -186,75 +216,94 @@ paths:
                 properties:
                   items:
                     type: array
-                    items: { $ref: '#/components/schemas/Incident' }
+                    items:
+                      "$ref": "#/components/schemas/Incident"
     post:
       summary: Create an incident.
-      tags: [Operations]
+      tags:
+      - Operations
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateIncidentRequest' }
+            schema:
+              "$ref": "#/components/schemas/CreateIncidentRequest"
       responses:
         '201':
           description: Incident created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Incident' }
-  /v1/operations/incidents/{incidentId}:
+              schema:
+                "$ref": "#/components/schemas/Incident"
+  "/v1/operations/incidents/{incidentId}":
     get:
       summary: Get incident detail.
-      tags: [Operations]
+      tags:
+      - Operations
       parameters:
-        - in: path
-          name: incidentId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: incidentId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Incident detail
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Incident' }
+              schema:
+                "$ref": "#/components/schemas/Incident"
     patch:
       summary: Update incident.
-      tags: [Operations]
+      tags:
+      - Operations
       parameters:
-        - in: path
-          name: incidentId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: incidentId
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpdateIncidentRequest' }
+            schema:
+              "$ref": "#/components/schemas/UpdateIncidentRequest"
       responses:
         '200':
           description: Incident updated
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Incident' }
+              schema:
+                "$ref": "#/components/schemas/Incident"
     delete:
       summary: Archive incident.
-      tags: [Operations]
+      tags:
+      - Operations
       parameters:
-        - in: path
-          name: incidentId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: incidentId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '204':
           description: Incident archived
-  /v1/operations/corrective-actions:
+  "/v1/operations/corrective-actions":
     get:
       summary: List corrective actions.
-      tags: [Operations]
+      tags:
+      - Operations
       parameters:
-        - in: query
-          name: siteId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: query
+        name: siteId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Corrective action list
@@ -265,341 +314,847 @@ paths:
                 properties:
                   items:
                     type: array
-                    items: { $ref: '#/components/schemas/CorrectiveAction' }
+                    items:
+                      "$ref": "#/components/schemas/CorrectiveAction"
     post:
       summary: Create a corrective action.
-      tags: [Operations]
+      tags:
+      - Operations
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateCorrectiveActionRequest' }
+            schema:
+              "$ref": "#/components/schemas/CreateCorrectiveActionRequest"
       responses:
         '201':
           description: Corrective action created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/CorrectiveAction' }
-  /v1/operations/corrective-actions/{actionId}:
+              schema:
+                "$ref": "#/components/schemas/CorrectiveAction"
+  "/v1/operations/corrective-actions/{actionId}":
     get:
       summary: Get corrective action detail.
-      tags: [Operations]
+      tags:
+      - Operations
       parameters:
-        - in: path
-          name: actionId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: actionId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Corrective action detail
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/CorrectiveAction' }
+              schema:
+                "$ref": "#/components/schemas/CorrectiveAction"
     patch:
       summary: Update corrective action.
-      tags: [Operations]
+      tags:
+      - Operations
       parameters:
-        - in: path
-          name: actionId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: actionId
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpdateCorrectiveActionRequest' }
+            schema:
+              "$ref": "#/components/schemas/UpdateCorrectiveActionRequest"
       responses:
         '200':
           description: Corrective action updated
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/CorrectiveAction' }
+              schema:
+                "$ref": "#/components/schemas/CorrectiveAction"
     delete:
       summary: Archive corrective action.
-      tags: [Operations]
+      tags:
+      - Operations
       parameters:
-        - in: path
-          name: actionId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: actionId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '204':
           description: Corrective action archived
-  /v1/insights/dashboard/summary:
+  "/v1/insights/dashboard/summary":
     get:
       summary: Retrieve KPI summary for the dashboard hero cards.
-      tags: [Insights]
+      tags:
+      - Insights
       parameters:
-        - in: query
-          name: siteId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: query
+        name: siteId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Dashboard summary
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/DashboardSummary' }
-  /v1/insights/exports:
+              schema:
+                "$ref": "#/components/schemas/DashboardSummary"
+  "/v1/insights/exports":
     post:
       summary: Start export pack generation (PDF/ZIP) for audits or leadership review.
-      tags: [Insights]
+      tags:
+      - Insights
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateExportJobRequest' }
+            schema:
+              "$ref": "#/components/schemas/CreateExportJobRequest"
       responses:
         '202':
           description: Export job queued
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ReportExportJob' }
-  /v1/insights/exports/{jobId}:
+              schema:
+                "$ref": "#/components/schemas/ReportExportJob"
+  "/v1/insights/exports/{jobId}":
     get:
       summary: Get export job status and download URL when ready.
-      tags: [Insights]
+      tags:
+      - Insights
       parameters:
-        - in: path
-          name: jobId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: jobId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Export job detail
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ReportExportJob' }
+              schema:
+                "$ref": "#/components/schemas/ReportExportJob"
+  "/v1/programs/documents/{documentId}/regenerate":
+    post:
+      summary: Re-generate a program document and create a new draft revision.
+      tags:
+      - Programs
+      parameters:
+      - in: path
+        name: documentId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '202':
+          description: Program re-generation accepted
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProgramRevisionJob"
+  "/v1/programs/revisions/{revisionId}/review":
+    post:
+      summary: Submit a draft revision for review and assign approval steps.
+      tags:
+      - Programs
+      parameters:
+      - in: path
+        name: revisionId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/SubmitProgramRevisionReviewRequest"
+      responses:
+        '200':
+          description: Revision submitted for review
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProgramRevision"
+  "/v1/programs/revisions/{revisionId}/approve":
+    post:
+      summary: Capture approval/rejection decisions for a revision step.
+      tags:
+      - Programs
+      parameters:
+      - in: path
+        name: revisionId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ProgramApprovalDecisionRequest"
+      responses:
+        '200':
+          description: Revision approval state updated
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProgramRevision"
+  "/v1/programs/exports/pdf-pack":
+    post:
+      summary: Queue a PDF inspection/leadership/legal export pack of published programs.
+      tags:
+      - Programs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ProgramPdfExportRequest"
+      responses:
+        '202':
+          description: Program PDF pack queued
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ReportExportJob"
 components:
   schemas:
     StartQuestionnaireSessionRequest:
       type: object
-      required: [siteId]
+      required:
+      - siteId
       properties:
-        siteId: { type: string, format: uuid }
+        siteId:
+          type: string
+          format: uuid
     SubmitAnswerBatchRequest:
       type: object
-      required: [answers]
+      required:
+      - answers
       properties:
         answers:
           type: array
           minItems: 1
           items:
             type: object
-            required: [questionId, answer]
+            required:
+            - questionId
+            - answer
             properties:
-              questionId: { type: string, format: uuid }
+              questionId:
+                type: string
+                format: uuid
               answer: {}
     QuestionnaireSession:
       type: object
       properties:
-        snapshot: { $ref: '#/components/schemas/IntakeSnapshot' }
+        snapshot:
+          "$ref": "#/components/schemas/IntakeSnapshot"
         visibleQuestions:
           type: array
-          items: { $ref: '#/components/schemas/IntakeQuestion' }
+          items:
+            "$ref": "#/components/schemas/IntakeQuestion"
     IntakeQuestion:
       type: object
-      required: [id, prompt, type]
+      required:
+      - id
+      - prompt
+      - type
       properties:
-        id: { type: string, format: uuid }
-        prompt: { type: string }
-        type: { type: string, enum: [single_choice, multi_choice, boolean, text, number] }
+        id:
+          type: string
+          format: uuid
+        prompt:
+          type: string
+        type:
+          type: string
+          enum:
+          - single_choice
+          - multi_choice
+          - boolean
+          - text
+          - number
         options:
           type: array
-          items: { type: string }
+          items:
+            type: string
         branch_rules:
           type: array
-          items: { $ref: '#/components/schemas/IntakeBranchRule' }
+          items:
+            "$ref": "#/components/schemas/IntakeBranchRule"
     IntakeBranchRule:
       type: object
-      required: [id, all, show_question_ids, reason]
+      required:
+      - id
+      - all
+      - show_question_ids
+      - reason
       properties:
-        id: { type: string }
+        id:
+          type: string
         all:
           type: array
-          items: { $ref: '#/components/schemas/IntakeBranchCondition' }
+          items:
+            "$ref": "#/components/schemas/IntakeBranchCondition"
         show_question_ids:
           type: array
-          items: { type: string, format: uuid }
-        reason: { type: string }
+          items:
+            type: string
+            format: uuid
+        reason:
+          type: string
     IntakeBranchCondition:
       type: object
-      required: [question_id, operator, value]
+      required:
+      - question_id
+      - operator
+      - value
       properties:
-        question_id: { type: string, format: uuid }
-        operator: { type: string, enum: [eq, neq, includes] }
+        question_id:
+          type: string
+          format: uuid
+        operator:
+          type: string
+          enum:
+          - eq
+          - neq
+          - includes
         value: {}
     IntakeResponse:
       type: object
-      required: [snapshot_id, question_id, answer]
+      required:
+      - snapshot_id
+      - question_id
+      - answer
       properties:
-        snapshot_id: { type: string, format: uuid }
-        question_id: { type: string, format: uuid }
+        snapshot_id:
+          type: string
+          format: uuid
+        question_id:
+          type: string
+          format: uuid
         answer: {}
     DerivedProfileAttribute:
       type: object
-      required: [key, value, why_this_applies]
+      required:
+      - key
+      - value
+      - why_this_applies
       properties:
-        key: { type: string }
+        key:
+          type: string
         value: {}
-        why_this_applies: { type: string }
+        why_this_applies:
+          type: string
     IntakeSnapshot:
       type: object
-      required: [id, site_id, version, created_at, profile_hash, status, responses, metadata]
+      required:
+      - id
+      - site_id
+      - version
+      - created_at
+      - profile_hash
+      - status
+      - responses
+      - metadata
       properties:
-        id: { type: string, format: uuid }
-        site_id: { type: string, format: uuid }
-        version: { type: integer, minimum: 1 }
-        created_at: { type: string, format: date-time }
-        profile_hash: { type: string }
-        status: { type: string, enum: [draft, finalized] }
+        id:
+          type: string
+          format: uuid
+        site_id:
+          type: string
+          format: uuid
+        version:
+          type: integer
+          minimum: 1
+        created_at:
+          type: string
+          format: date-time
+        profile_hash:
+          type: string
+        status:
+          type: string
+          enum:
+          - draft
+          - finalized
         responses:
           type: array
-          items: { $ref: '#/components/schemas/IntakeResponse' }
+          items:
+            "$ref": "#/components/schemas/IntakeResponse"
         metadata:
           type: object
-          required: [evaluated_path, visible_question_ids, explainability]
+          required:
+          - evaluated_path
+          - visible_question_ids
+          - explainability
           properties:
             evaluated_path:
               type: array
-              items: { type: string }
+              items:
+                type: string
             visible_question_ids:
               type: array
-              items: { type: string, format: uuid }
+              items:
+                type: string
+                format: uuid
             explainability:
               type: array
-              items: { $ref: '#/components/schemas/DerivedProfileAttribute' }
+              items:
+                "$ref": "#/components/schemas/DerivedProfileAttribute"
     IntakeSnapshotHistory:
       type: object
-      required: [snapshot, explanation]
+      required:
+      - snapshot
+      - explanation
       properties:
-        snapshot: { $ref: '#/components/schemas/IntakeSnapshot' }
+        snapshot:
+          "$ref": "#/components/schemas/IntakeSnapshot"
         explanation:
           type: object
-          required: [evaluated_path, attributes]
+          required:
+          - evaluated_path
+          - attributes
           properties:
             evaluated_path:
               type: array
-              items: { type: string }
+              items:
+                type: string
             attributes:
               type: array
-              items: { $ref: '#/components/schemas/DerivedProfileAttribute' }
+              items:
+                "$ref": "#/components/schemas/DerivedProfileAttribute"
     ApplicabilityEvaluationRequest:
       type: object
-      required: [snapshotId]
+      required:
+      - snapshotId
       properties:
-        snapshotId: { type: string, format: uuid }
+        snapshotId:
+          type: string
+          format: uuid
     ApplicabilityEvaluationResult:
       type: object
       properties:
-        snapshotId: { type: string, format: uuid }
+        snapshotId:
+          type: string
+          format: uuid
         obligations:
           type: array
           items:
             type: object
             properties:
-              obligationId: { type: string, format: uuid }
-              reason: { type: string }
-              ruleId: { type: string, format: uuid }
+              obligationId:
+                type: string
+                format: uuid
+              reason:
+                type: string
+              ruleId:
+                type: string
+                format: uuid
     Obligation:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        title: { type: string }
-        citation: { type: string }
-        source: { type: string }
-        currentVersion: { type: string }
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        citation:
+          type: string
+        source:
+          type: string
+        currentVersion:
+          type: string
     GenerateProgramsRequest:
       type: object
-      required: [siteId, obligationIds]
+      required:
+      - siteId
+      - obligationIds
       properties:
-        siteId: { type: string, format: uuid }
+        siteId:
+          type: string
+          format: uuid
         obligationIds:
           type: array
           minItems: 1
-          items: { type: string, format: uuid }
+          items:
+            type: string
+            format: uuid
         programs:
           type: array
-          default: [Hazard Communication, Incident Investigation, Emergency Preparedness, PPE, Contractor Safety]
-          items: { type: string }
+          default:
+          - policy-governance
+          - incident-reporting
+          - hazard-identification
+          - corrective-actions
+          - training-baseline
+          items:
+            type: string
+            enum:
+            - policy-governance
+            - incident-reporting
+            - hazard-identification
+            - corrective-actions
+            - training-baseline
     ProgramGenerationJob:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        status: { type: string, enum: [queued, running, completed, failed] }
-        requestedAt: { type: string, format: date-time }
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - queued
+          - running
+          - completed
+          - failed
+        requestedAt:
+          type: string
+          format: date-time
+        generatedProgramKeys:
+          type: array
+          items:
+            type: string
     ProgramDocument:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        siteId: { type: string, format: uuid }
-        title: { type: string }
-        status: { type: string, enum: [draft, review, approved, published] }
+        id:
+          type: string
+          format: uuid
+        siteId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        status:
+          type: string
+          enum:
+          - draft
+          - review
+          - approved
+          - published
         obligationIds:
           type: array
-          items: { type: string, format: uuid }
+          items:
+            type: string
+            format: uuid
+        currentRevisionId:
+          type: string
+          format: uuid
+          nullable: true
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
     Incident:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        siteId: { type: string, format: uuid }
-        eventDate: { type: string, format: date-time }
-        severity: { type: string, enum: [low, medium, high, critical] }
-        status: { type: string, enum: [open, in_review, closed] }
-        obligationId: { type: string, format: uuid, nullable: true }
-        programDocumentId: { type: string, format: uuid, nullable: true }
+        id:
+          type: string
+          format: uuid
+        siteId:
+          type: string
+          format: uuid
+        eventDate:
+          type: string
+          format: date-time
+        severity:
+          type: string
+          enum:
+          - low
+          - medium
+          - high
+          - critical
+        status:
+          type: string
+          enum:
+          - open
+          - in_review
+          - closed
+        obligationId:
+          type: string
+          format: uuid
+          nullable: true
+        programDocumentId:
+          type: string
+          format: uuid
+          nullable: true
     CreateIncidentRequest:
       allOf:
-        - $ref: '#/components/schemas/Incident'
+      - "$ref": "#/components/schemas/Incident"
     UpdateIncidentRequest:
       type: object
       properties:
-        severity: { type: string, enum: [low, medium, high, critical] }
-        status: { type: string, enum: [open, in_review, closed] }
+        severity:
+          type: string
+          enum:
+          - low
+          - medium
+          - high
+          - critical
+        status:
+          type: string
+          enum:
+          - open
+          - in_review
+          - closed
     CorrectiveAction:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        siteId: { type: string, format: uuid }
-        incidentId: { type: string, format: uuid, nullable: true }
-        description: { type: string }
-        ownerUserId: { type: string, format: uuid }
-        dueDate: { type: string, format: date }
-        status: { type: string, enum: [open, in_progress, done, overdue] }
-        obligationId: { type: string, format: uuid, nullable: true }
-        programDocumentId: { type: string, format: uuid, nullable: true }
+        id:
+          type: string
+          format: uuid
+        siteId:
+          type: string
+          format: uuid
+        incidentId:
+          type: string
+          format: uuid
+          nullable: true
+        description:
+          type: string
+        ownerUserId:
+          type: string
+          format: uuid
+        dueDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - open
+          - in_progress
+          - done
+          - overdue
+        obligationId:
+          type: string
+          format: uuid
+          nullable: true
+        programDocumentId:
+          type: string
+          format: uuid
+          nullable: true
     CreateCorrectiveActionRequest:
       allOf:
-        - $ref: '#/components/schemas/CorrectiveAction'
+      - "$ref": "#/components/schemas/CorrectiveAction"
     UpdateCorrectiveActionRequest:
       type: object
       properties:
-        status: { type: string, enum: [open, in_progress, done, overdue] }
-        dueDate: { type: string, format: date }
-        ownerUserId: { type: string, format: uuid }
+        status:
+          type: string
+          enum:
+          - open
+          - in_progress
+          - done
+          - overdue
+        dueDate:
+          type: string
+          format: date
+        ownerUserId:
+          type: string
+          format: uuid
     DashboardSummary:
       type: object
       properties:
-        openActions: { type: integer }
-        overdueObligations: { type: integer }
-        trainingCompletionPercent: { type: number }
-        incidentRate: { type: number }
-        auditScore: { type: number }
-        generatedAt: { type: string, format: date-time }
+        openActions:
+          type: integer
+        overdueObligations:
+          type: integer
+        trainingCompletionPercent:
+          type: number
+        incidentRate:
+          type: number
+        auditScore:
+          type: number
+        generatedAt:
+          type: string
+          format: date-time
     CreateExportJobRequest:
       type: object
-      required: [siteId, format]
+      required:
+      - siteId
+      - format
       properties:
-        siteId: { type: string, format: uuid }
-        format: { type: string, enum: [pdf, zip] }
+        siteId:
+          type: string
+          format: uuid
+        format:
+          type: string
+          enum:
+          - pdf
+          - zip
         includeSections:
           type: array
-          items: { type: string }
+          items:
+            type: string
     ReportExportJob:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        siteId: { type: string, format: uuid }
-        status: { type: string, enum: [queued, running, ready, failed] }
-        downloadUrl: { type: string, format: uri, nullable: true }
-        createdAt: { type: string, format: date-time }
+        id:
+          type: string
+          format: uuid
+        siteId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - queued
+          - running
+          - ready
+          - failed
+        downloadUrl:
+          type: string
+          format: uri
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    ProgramRevisionJob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        documentId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - queued
+          - running
+          - completed
+          - failed
+        requestedAt:
+          type: string
+          format: date-time
+    ProgramRevision:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        programDocumentId:
+          type: string
+          format: uuid
+        revisionNumber:
+          type: integer
+          minimum: 1
+        status:
+          type: string
+          enum:
+          - draft
+          - review
+          - approved
+          - published
+        sections:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ProgramRevisionSection"
+        approvalSteps:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ApprovalStep"
+        generatedAt:
+          type: string
+          format: date-time
+    ProgramRevisionSection:
+      type: object
+      properties:
+        key:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        citations:
+          type: array
+          items:
+            type: string
+    ApprovalStep:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        programRevisionId:
+          type: string
+          format: uuid
+        stepOrder:
+          type: integer
+          minimum: 1
+        approverUserId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - pending
+          - approved
+          - rejected
+        comments:
+          type: string
+          nullable: true
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+    SubmitProgramRevisionReviewRequest:
+      type: object
+      required:
+      - approverUserIds
+      properties:
+        approverUserIds:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: uuid
+    ProgramApprovalDecisionRequest:
+      type: object
+      required:
+      - approvalStepId
+      - approverUserId
+      - decision
+      properties:
+        approvalStepId:
+          type: string
+          format: uuid
+        approverUserId:
+          type: string
+          format: uuid
+        decision:
+          type: string
+          enum:
+          - approved
+          - rejected
+        comments:
+          type: string
+    ProgramPdfExportRequest:
+      type: object
+      required:
+      - siteId
+      properties:
+        siteId:
+          type: string
+          format: uuid
+        bundleName:
+          type: string
+          default: inspection-leadership-legal-pack
