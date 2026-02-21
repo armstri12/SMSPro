@@ -22,6 +22,7 @@ npm run build
 npm run typecheck
 npm run test
 npm run test:smoke
+npm run test:e2e
 ```
 
 ## Local DB stack
@@ -39,3 +40,4 @@ Default DB URL used by scripts is `postgresql://smspro:smspro@localhost:5432/sms
 - `npm run dev` starts all five backend service stubs plus the frontend dashboard server.
 - Each backend service exposes `/health` for basic liveness checks.
 - `npm run test:smoke` launches service stubs and validates one happy-path endpoint per Phase 1 module against expected response shape.
+- `npm run test:e2e` runs the intake → applicability → program generation → incident + corrective action → insights + export sanity flow.
