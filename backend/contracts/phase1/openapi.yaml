@@ -8,42 +8,48 @@ info:
 servers:
   - url: https://api.smspro.local
 paths:
-  /v1/intake/questionnaires/{siteId}:
-    get:
-      summary: Fetch dynamic intake questionnaire for a site profile.
-      tags: [Intake]
-      parameters:
-        - in: path
-          name: siteId
-          required: true
-          schema: { type: string, format: uuid }
-      responses:
-        '200':
-          description: Questionnaire payload
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IntakeQuestionnaire'
-  /v1/intake/snapshots:
+  /v1/intake/sessions:
     post:
-      summary: Create an immutable intake snapshot.
+      summary: Start questionnaire session as a draft snapshot version.
       tags: [Intake]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateIntakeSnapshotRequest'
+              $ref: '#/components/schemas/StartQuestionnaireSessionRequest'
       responses:
         '201':
-          description: Snapshot created
+          description: Session started
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IntakeSnapshot'
-  /v1/intake/snapshots/{snapshotId}:
-    get:
-      summary: Get a historical intake snapshot.
+                $ref: '#/components/schemas/QuestionnaireSession'
+  /v1/intake/sessions/{snapshotId}/answers:
+    post:
+      summary: Submit answer batch and re-evaluate deterministic branching.
+      tags: [Intake]
+      parameters:
+        - in: path
+          name: snapshotId
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitAnswerBatchRequest'
+      responses:
+        '200':
+          description: Updated session state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionnaireSession'
+  /v1/intake/snapshots/{snapshotId}/finalize:
+    post:
+      summary: Finalize immutable intake snapshot and profile explainability.
       tags: [Intake]
       parameters:
         - in: path
@@ -52,11 +58,27 @@ paths:
           schema: { type: string, format: uuid }
       responses:
         '200':
-          description: Snapshot payload
+          description: Snapshot finalized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/IntakeSnapshot'
+  /v1/intake/snapshots/{snapshotId}:
+    get:
+      summary: Get a historical intake snapshot with deterministic path explanation.
+      tags: [Intake]
+      parameters:
+        - in: path
+          name: snapshotId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Snapshot payload and explanation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeSnapshotHistory'
   /v1/regulatory/applicability/evaluate:
     post:
       summary: Evaluate applicability and produce explainable obligation matches.
@@ -350,43 +372,118 @@ paths:
               schema: { $ref: '#/components/schemas/ReportExportJob' }
 components:
   schemas:
-    IntakeQuestionnaire:
+    StartQuestionnaireSessionRequest:
       type: object
+      required: [siteId]
       properties:
         siteId: { type: string, format: uuid }
-        version: { type: string }
-        questions:
-          type: array
-          items:
-            type: object
-            properties:
-              id: { type: string, format: uuid }
-              prompt: { type: string }
-              type: { type: string, enum: [single_choice, multi_choice, boolean, text, number] }
-              conditions:
-                type: array
-                items: { type: string }
-    CreateIntakeSnapshotRequest:
+    SubmitAnswerBatchRequest:
       type: object
-      required: [siteId, responses, createdBy]
+      required: [answers]
       properties:
-        siteId: { type: string, format: uuid }
-        responses:
+        answers:
           type: array
+          minItems: 1
           items:
             type: object
+            required: [questionId, answer]
             properties:
               questionId: { type: string, format: uuid }
-              value: {}
-        createdBy: { type: string, format: uuid }
-    IntakeSnapshot:
+              answer: {}
+    QuestionnaireSession:
       type: object
       properties:
+        snapshot: { $ref: '#/components/schemas/IntakeSnapshot' }
+        visibleQuestions:
+          type: array
+          items: { $ref: '#/components/schemas/IntakeQuestion' }
+    IntakeQuestion:
+      type: object
+      required: [id, prompt, type]
+      properties:
         id: { type: string, format: uuid }
-        siteId: { type: string, format: uuid }
-        createdAt: { type: string, format: date-time }
-        createdBy: { type: string, format: uuid }
-        responses: { type: array, items: { type: object } }
+        prompt: { type: string }
+        type: { type: string, enum: [single_choice, multi_choice, boolean, text, number] }
+        options:
+          type: array
+          items: { type: string }
+        branch_rules:
+          type: array
+          items: { $ref: '#/components/schemas/IntakeBranchRule' }
+    IntakeBranchRule:
+      type: object
+      required: [id, all, show_question_ids, reason]
+      properties:
+        id: { type: string }
+        all:
+          type: array
+          items: { $ref: '#/components/schemas/IntakeBranchCondition' }
+        show_question_ids:
+          type: array
+          items: { type: string, format: uuid }
+        reason: { type: string }
+    IntakeBranchCondition:
+      type: object
+      required: [question_id, operator, value]
+      properties:
+        question_id: { type: string, format: uuid }
+        operator: { type: string, enum: [eq, neq, includes] }
+        value: {}
+    IntakeResponse:
+      type: object
+      required: [snapshot_id, question_id, answer]
+      properties:
+        snapshot_id: { type: string, format: uuid }
+        question_id: { type: string, format: uuid }
+        answer: {}
+    DerivedProfileAttribute:
+      type: object
+      required: [key, value, why_this_applies]
+      properties:
+        key: { type: string }
+        value: {}
+        why_this_applies: { type: string }
+    IntakeSnapshot:
+      type: object
+      required: [id, site_id, version, created_at, profile_hash, status, responses, metadata]
+      properties:
+        id: { type: string, format: uuid }
+        site_id: { type: string, format: uuid }
+        version: { type: integer, minimum: 1 }
+        created_at: { type: string, format: date-time }
+        profile_hash: { type: string }
+        status: { type: string, enum: [draft, finalized] }
+        responses:
+          type: array
+          items: { $ref: '#/components/schemas/IntakeResponse' }
+        metadata:
+          type: object
+          required: [evaluated_path, visible_question_ids, explainability]
+          properties:
+            evaluated_path:
+              type: array
+              items: { type: string }
+            visible_question_ids:
+              type: array
+              items: { type: string, format: uuid }
+            explainability:
+              type: array
+              items: { $ref: '#/components/schemas/DerivedProfileAttribute' }
+    IntakeSnapshotHistory:
+      type: object
+      required: [snapshot, explanation]
+      properties:
+        snapshot: { $ref: '#/components/schemas/IntakeSnapshot' }
+        explanation:
+          type: object
+          required: [evaluated_path, attributes]
+          properties:
+            evaluated_path:
+              type: array
+              items: { type: string }
+            attributes:
+              type: array
+              items: { $ref: '#/components/schemas/DerivedProfileAttribute' }
     ApplicabilityEvaluationRequest:
       type: object
       required: [snapshotId]

@@ -50,3 +50,53 @@ export interface CorrectiveAction {
   dueDate: string;
   status: "open" | "in_progress" | "done" | "overdue";
 }
+
+export type IntakeQuestionType = "single_choice" | "multi_choice" | "boolean" | "text" | "number";
+
+export interface IntakeBranchCondition {
+  questionId: string;
+  operator: "eq" | "neq" | "includes";
+  value: unknown;
+}
+
+export interface IntakeBranchRule {
+  id: string;
+  all: IntakeBranchCondition[];
+  showQuestionIds: string[];
+  reason: string;
+}
+
+export interface IntakeQuestion {
+  id: string;
+  prompt: string;
+  type: IntakeQuestionType;
+  options?: string[];
+  branchRules?: IntakeBranchRule[];
+}
+
+export interface IntakeResponse {
+  snapshotId: string;
+  questionId: string;
+  answer: unknown;
+}
+
+export interface DerivedProfileAttribute {
+  key: string;
+  value: unknown;
+  whyThisApplies: string;
+}
+
+export interface IntakeSnapshot {
+  id: string;
+  siteId: string;
+  version: number;
+  createdAt: string;
+  profileHash: string;
+  status: "draft" | "finalized";
+  responses: IntakeResponse[];
+  metadata: {
+    evaluatedPath: string[];
+    visibleQuestionIds: string[];
+    explainability: DerivedProfileAttribute[];
+  };
+}
