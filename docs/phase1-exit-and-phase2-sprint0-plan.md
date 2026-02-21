@@ -124,3 +124,70 @@ By end of Sprint-0, the team should publish:
 2. Confirm owners and due dates for each Phase 1 exit gate.
 3. Start Phase 1 evidence collection in a shared release checklist.
 4. Schedule Sprint-0 kickoff and architecture workshops.
+
+---
+
+## 7) Runnable/testable bridge plan (Phase 1 close-out backlog)
+
+Use this sequence to move from scaffolded modules to an environment that can be run and validated end-to-end.
+
+### P0 (must complete to declare “runnable MVP slice”)
+
+1. **Monorepo toolchain + shared scripts**
+   - Add root scripts for `build`, `typecheck`, `test`, and `dev` orchestration.
+   - Standardize TypeScript config and lint config across all workspace packages.
+   - **Done when:** a single root command can execute all package-level checks.
+
+2. **Backend service bootstraps (all Phase 1 modules)**
+   - Add minimal HTTP servers for intake/regulatory/programs/operations/insights with `/health` endpoints.
+   - Wire each server to handlers already represented by module boundaries.
+   - **Done when:** each service starts locally and returns 200 for `/health`.
+
+3. **Local dependency stack**
+   - Add `docker-compose.yml` for PostgreSQL (and optional Redis if needed for jobs).
+   - Add seed/reset scripts for local developer data.
+   - **Done when:** a fresh clone can create DB + apply schema with one documented command path.
+
+4. **Phase 1 contract conformance tests**
+   - Implement API smoke tests that hit endpoint stubs against `backend/contracts/phase1/openapi.yaml`.
+   - Validate request/response shapes for at least one happy-path operation per service.
+   - **Done when:** CI executes smoke tests and publishes pass/fail status.
+
+5. **Dashboard shell runtime wiring**
+   - Add a runnable front-end dev server and connect to local service endpoints.
+   - Implement mocked fallback mode so UI can run before full backend completion.
+   - **Done when:** dashboard page loads and renders health/status cards from live or mocked data.
+
+### P1 (complete immediately after P0 for testability confidence)
+
+1. **Seeded demo scenario**
+   - Provide one end-to-end demo tenant with questionnaire answers, obligations, generated program, incident, and KPI data.
+   - **Done when:** team can run a single script and view complete demo flow.
+
+2. **End-to-end sanity path**
+   - Automate: Intake submission → Applicability result → Program generation → Incident + corrective action → Insights read.
+   - **Done when:** one command runs this path in CI and locally.
+
+3. **Release checklist automation**
+   - Convert Phase 1 exit evidence into machine-verifiable checks where possible (contract lint, schema verify, smoke tests, basic SLA probe).
+   - **Done when:** release candidate build produces a checklist artifact with links to logs/reports.
+
+### Suggested execution order (10 working days)
+
+- **Days 1-2:** P0.1, P0.3
+- **Days 3-5:** P0.2
+- **Days 6-7:** P0.4
+- **Days 8-9:** P0.5 + P1.1
+- **Day 10:** P1.2 + P1.3 and Phase 1 closure evidence review
+
+### Minimum command surface to target by end of Phase 1
+
+```bash
+npm run dev
+npm run build
+npm run typecheck
+npm run test
+npm run test:smoke
+```
+
+If these commands are stable on a clean machine (plus DB bring-up), Phase 1 is in a practical run/test-ready state.
