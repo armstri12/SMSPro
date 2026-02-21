@@ -1,0 +1,15 @@
+{
+  "name": "smspro",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SMSPro monorepo scaffold",
+  "workspaces": [
+    "backend/*",
+    "frontend/*",
+    "shared/*"
+  ],
+  "scripts": {
+    "lint:contracts": "ruby -e 'require \"yaml\"; YAML.load_file(\"backend/contracts/phase1/openapi.yaml\"); puts \"openapi ok\"'",
+    "check:schema": "test -f backend/database/migrations/0001_baseline.sql && echo 'baseline schema present'"
+  }
+}
