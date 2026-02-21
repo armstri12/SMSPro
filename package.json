@@ -19,6 +19,7 @@
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
     "db:reset": "./scripts/db-reset.sh",
-    "db:seed": "./scripts/db-seed.sh"
+    "db:seed": "./scripts/db-seed.sh",
+    "test:e2e": "node scripts/test-e2e-sanity.js"
   }
 }

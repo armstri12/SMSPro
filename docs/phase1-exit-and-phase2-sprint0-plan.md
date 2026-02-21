@@ -188,6 +188,7 @@ npm run build
 npm run typecheck
 npm run test
 npm run test:smoke
+npm run test:e2e
 ```
 
 If these commands are stable on a clean machine (plus DB bring-up), Phase 1 is in a practical run/test-ready state.
