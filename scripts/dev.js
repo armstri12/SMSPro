@@ -1,4 +1,7 @@
 const { spawn } = require('child_process');
+const path = require('path');
+
+const isWindows = process.platform === 'win32';
 
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
@@ -11,10 +14,33 @@ const services = [
   { name: 'frontend', cwd: 'frontend/web', port: 4173 }
 ];
 
+function getSpawnSpec() {
+  if (isWindows) {
+    return {
+      command: 'cmd.exe',
+      args: ['/d', '/s', '/c', 'npm run dev']
+    };
+  }
+
+  return {
+    command: 'npm',
+    args: ['run', 'dev']
+  };
+}
+
+function withPortEnv(port) {
+  return {
+    ...process.env,
+    PORT: String(port)
+  };
+}
+
+const { command, args } = getSpawnSpec();
+
 const procs = services.map((service) => {
-  const proc = spawn(npmCommand, ['run', 'dev'], {
-    cwd: service.cwd,
-    env: { ...process.env, PORT: String(service.port) },
+  const proc = spawn(command, args, {
+    cwd: path.resolve(__dirname, '..', service.cwd),
+    env: withPortEnv(service.port),
     stdio: 'inherit'
   });
 
