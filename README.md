@@ -39,3 +39,4 @@ Monorepo scaffold for the SMSPro MVP described in `docs/smspro-e2e-scope-and-des
 
 - This commit focuses on module boundaries, contracts, and schema scaffolding for Phase 1.
 - Implementation code for service handlers and front-end views can be added independently in each package.
+- Execution planning reference: `docs/phase1-exit-and-phase2-sprint0-plan.md`.
