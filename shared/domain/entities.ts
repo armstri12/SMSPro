@@ -89,23 +89,40 @@ export interface ApprovalStep {
 export interface Incident {
   id: string;
   siteId: string;
+  title?: string;
+  description?: string;
   obligationId?: string;
   programDocumentId?: string;
   eventDate: string;
   severity: "low" | "medium" | "high" | "critical";
-  status: "open" | "in_review" | "closed";
+  status: "reported" | "triaged" | "investigating" | "resolved" | "closed" | "archived";
 }
 
 export interface CorrectiveAction {
   id: string;
   incidentId?: string;
   siteId: string;
+  title?: string;
   obligationId?: string;
   programDocumentId?: string;
   description: string;
   ownerUserId: string;
   dueDate: string;
-  status: "open" | "in_progress" | "done" | "overdue";
+  status: "open" | "in_progress" | "completed" | "overdue" | "archived";
+  completedAt?: string;
+}
+
+export interface EvidenceArtifact {
+  id: string;
+  siteId: string;
+  linkedEntityType: "incident" | "corrective_action" | "inspection" | "finding" | "training" | "permit";
+  linkedEntityId: string;
+  artifactType: "document" | "photo" | "signoff" | "record_link";
+  uri: string;
+  title?: string;
+  obligationId?: string;
+  programDocumentId?: string;
+  createdAt: string;
 }
 
 export type IntakeQuestionType = "single_choice" | "multi_choice" | "boolean" | "text" | "number";
