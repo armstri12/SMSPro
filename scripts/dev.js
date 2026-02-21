@@ -3,6 +3,8 @@ const path = require('path');
 
 const isWindows = process.platform === 'win32';
 
+const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+
 const services = [
   { name: 'intake', cwd: 'backend/intake', port: 4101 },
   { name: 'regulatory', cwd: 'backend/regulatory', port: 4102 },
