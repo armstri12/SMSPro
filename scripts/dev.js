@@ -1,4 +1,7 @@
 const { spawn } = require('child_process');
+const path = require('path');
+
+const isWindows = process.platform === 'win32';
 
 const services = [
   { name: 'intake', cwd: 'backend/intake', port: 4101 },
@@ -9,13 +12,43 @@ const services = [
   { name: 'frontend', cwd: 'frontend/web', port: 4173 }
 ];
 
-const procs = services.map((service) =>
-  spawn('npm', ['run', 'dev'], {
-    cwd: service.cwd,
-    env: { ...process.env, PORT: String(service.port) },
+function getSpawnSpec() {
+  if (isWindows) {
+    return {
+      command: 'cmd.exe',
+      args: ['/d', '/s', '/c', 'npm run dev']
+    };
+  }
+
+  return {
+    command: 'npm',
+    args: ['run', 'dev']
+  };
+}
+
+function withPortEnv(port) {
+  return {
+    ...process.env,
+    PORT: String(port)
+  };
+}
+
+const { command, args } = getSpawnSpec();
+
+const procs = services.map((service) => {
+  const proc = spawn(command, args, {
+    cwd: path.resolve(__dirname, '..', service.cwd),
+    env: withPortEnv(service.port),
     stdio: 'inherit'
-  })
-);
+  });
+
+  proc.on('error', (error) => {
+    console.error(`failed to start ${service.name}:`, error.message);
+    shutdown('SIGTERM');
+  });
+
+  return proc;
+});
 
 function shutdown(signal) {
   for (const proc of procs) {
