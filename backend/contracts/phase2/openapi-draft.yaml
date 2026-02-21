@@ -1,0 +1,308 @@
+openapi: 3.1.0
+info:
+  title: SMSPro Phase 2 API Draft Contracts
+  version: 0.2.0-draft
+  description: |
+    Sprint-0 draft API extensions for Phase 2 scope including inspections,
+    training matrix records, automation workflows, and program lifecycle acknowledgements.
+servers:
+  - url: https://api.smspro.local
+paths:
+  /v2/operations/inspections:
+    get:
+      summary: List inspections for a site.
+      tags: [Operations]
+      parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Inspection list.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Inspection'
+    post:
+      summary: Schedule a new inspection.
+      tags: [Operations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInspectionRequest'
+      responses:
+        '201':
+          description: Inspection created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+  /v2/operations/findings:
+    post:
+      summary: Create an inspection finding.
+      tags: [Operations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFindingRequest'
+      responses:
+        '201':
+          description: Finding created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Finding'
+  /v2/operations/training-records:
+    get:
+      summary: List training records for a site.
+      tags: [Operations]
+      parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Training records.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TrainingRecord'
+    post:
+      summary: Record training completion/competency evidence.
+      tags: [Operations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTrainingRecordRequest'
+      responses:
+        '201':
+          description: Training record created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingRecord'
+  /v2/workflows/rules:
+    get:
+      summary: List active automation rules.
+      tags: [Automation]
+      responses:
+        '200':
+          description: Rule list.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AutomationRule'
+    post:
+      summary: Create an automation/escalation rule.
+      tags: [Automation]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAutomationRuleRequest'
+      responses:
+        '201':
+          description: Rule created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationRule'
+  /v2/programs/documents/{documentId}/acknowledgements:
+    post:
+      summary: Capture document revision acknowledgement evidence.
+      tags: [Programs]
+      parameters:
+        - in: path
+          name: documentId
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRevisionAcknowledgementRequest'
+      responses:
+        '201':
+          description: Acknowledgement created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevisionAcknowledgement'
+
+components:
+  schemas:
+    Inspection:
+      type: object
+      required: [id, siteId, inspectionType, scheduledAt, status]
+      properties:
+        id: { type: string, format: uuid }
+        siteId: { type: string, format: uuid }
+        inspectionType: { type: string, enum: [workplace, equipment, behavioral, permit] }
+        checklistTemplateId: { type: string, format: uuid }
+        scheduledAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time }
+        inspectorUserId: { type: string, format: uuid }
+        status: { type: string, enum: [scheduled, in_progress, completed, overdue, archived] }
+        obligationId: { type: string, format: uuid }
+        programDocumentId: { type: string, format: uuid }
+    CreateInspectionRequest:
+      type: object
+      required: [siteId, inspectionType, scheduledAt, inspectorUserId]
+      properties:
+        siteId: { type: string, format: uuid }
+        inspectionType: { type: string, enum: [workplace, equipment, behavioral, permit] }
+        checklistTemplateId: { type: string, format: uuid }
+        scheduledAt: { type: string, format: date-time }
+        inspectorUserId: { type: string, format: uuid }
+        obligationId: { type: string, format: uuid }
+        programDocumentId: { type: string, format: uuid }
+    Finding:
+      type: object
+      required: [id, siteId, inspectionId, title, severity, status]
+      properties:
+        id: { type: string, format: uuid }
+        siteId: { type: string, format: uuid }
+        inspectionId: { type: string, format: uuid }
+        title: { type: string }
+        description: { type: string }
+        severity: { type: string, enum: [low, medium, high, critical] }
+        status: { type: string, enum: [open, mitigated, accepted_risk, archived] }
+        obligationId: { type: string, format: uuid }
+        programDocumentId: { type: string, format: uuid }
+    CreateFindingRequest:
+      type: object
+      required: [siteId, inspectionId, title, severity]
+      properties:
+        siteId: { type: string, format: uuid }
+        inspectionId: { type: string, format: uuid }
+        title: { type: string }
+        description: { type: string }
+        severity: { type: string, enum: [low, medium, high, critical] }
+        obligationId: { type: string, format: uuid }
+        programDocumentId: { type: string, format: uuid }
+    TrainingRecord:
+      type: object
+      required: [id, siteId, userId, moduleKey, dueDate, status]
+      properties:
+        id: { type: string, format: uuid }
+        siteId: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        moduleKey: { type: string }
+        dueDate: { type: string, format: date }
+        completedAt: { type: string, format: date-time }
+        competencyScore: { type: number, minimum: 0, maximum: 100 }
+        status: { type: string, enum: [assigned, in_progress, completed, overdue, waived] }
+        evidenceArtifactIds:
+          type: array
+          items: { type: string, format: uuid }
+        obligationId: { type: string, format: uuid }
+        programDocumentId: { type: string, format: uuid }
+    CreateTrainingRecordRequest:
+      type: object
+      required: [siteId, userId, moduleKey, dueDate]
+      properties:
+        siteId: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        moduleKey: { type: string }
+        dueDate: { type: string, format: date }
+        competencyScore: { type: number, minimum: 0, maximum: 100 }
+        obligationId: { type: string, format: uuid }
+        programDocumentId: { type: string, format: uuid }
+    AutomationRule:
+      type: object
+      required: [id, name, triggerEvent, escalationTarget, enabled]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        triggerEvent: { type: string }
+        conditions:
+          type: array
+          items: { $ref: '#/components/schemas/RuleCondition' }
+        actions:
+          type: array
+          items: { $ref: '#/components/schemas/RuleAction' }
+        escalationTarget: { type: string }
+        retryPolicy: { $ref: '#/components/schemas/RetryPolicy' }
+        idempotencyKeyTemplate: { type: string }
+        enabled: { type: boolean }
+    CreateAutomationRuleRequest:
+      type: object
+      required: [name, triggerEvent, escalationTarget, actions]
+      properties:
+        name: { type: string }
+        triggerEvent: { type: string }
+        conditions:
+          type: array
+          items: { $ref: '#/components/schemas/RuleCondition' }
+        actions:
+          type: array
+          items: { $ref: '#/components/schemas/RuleAction' }
+        escalationTarget: { type: string }
+        retryPolicy: { $ref: '#/components/schemas/RetryPolicy' }
+        idempotencyKeyTemplate: { type: string }
+    RuleCondition:
+      type: object
+      required: [field, operator, value]
+      properties:
+        field: { type: string }
+        operator: { type: string, enum: [eq, ne, gt, gte, lt, lte, in, contains] }
+        value: {}
+    RuleAction:
+      type: object
+      required: [type, channel]
+      properties:
+        type: { type: string, enum: [notify, assign, escalate, create_corrective_action] }
+        channel: { type: string, enum: [in_app, email, sms, webhook] }
+        target: { type: string }
+        payload:
+          type: object
+          additionalProperties: true
+    RetryPolicy:
+      type: object
+      properties:
+        maxAttempts: { type: integer, minimum: 1, maximum: 10 }
+        backoffSeconds: { type: integer, minimum: 1, maximum: 3600 }
+    RevisionAcknowledgement:
+      type: object
+      required: [id, documentId, revisionNumber, acknowledgedByUserId, acknowledgedAt, evidenceType]
+      properties:
+        id: { type: string, format: uuid }
+        documentId: { type: string, format: uuid }
+        revisionNumber: { type: integer, minimum: 1 }
+        acknowledgedByUserId: { type: string, format: uuid }
+        acknowledgedAt: { type: string, format: date-time }
+        evidenceType: { type: string, enum: [signature, quiz, attest, workflow_approval] }
+        evidenceUri: { type: string, format: uri }
+    CreateRevisionAcknowledgementRequest:
+      type: object
+      required: [revisionNumber, acknowledgedByUserId, evidenceType]
+      properties:
+        revisionNumber: { type: integer, minimum: 1 }
+        acknowledgedByUserId: { type: string, format: uuid }
+        evidenceType: { type: string, enum: [signature, quiz, attest, workflow_approval] }
+        evidenceUri: { type: string, format: uri }

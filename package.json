@@ -14,7 +14,7 @@
     "typecheck": "npm run lint:contracts",
     "test": "npm run check:schema",
     "test:smoke": "node scripts/test-smoke.js",
-    "lint:contracts": "ruby -e 'require \"yaml\"; YAML.load_file(\"backend/contracts/phase1/openapi.yaml\"); puts \"openapi ok\"'",
+    "lint:contracts": "ruby -e 'require \"yaml\"; YAML.load_file(\"backend/contracts/phase1/openapi.yaml\"); YAML.load_file(\"backend/contracts/phase2/openapi-draft.yaml\"); puts \"openapi ok\"'",
     "check:schema": "test -f backend/database/migrations/0001_baseline.sql && echo 'baseline schema present'",
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",

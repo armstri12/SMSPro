@@ -10,6 +10,7 @@ Monorepo scaffold for the SMSPro MVP described in `docs/smspro-e2e-scope-and-des
 - `backend/operations` – Incidents and corrective actions.
 - `backend/insights` – Dashboard and export jobs.
 - `backend/contracts/phase1/openapi.yaml` – Phase 1 API contract definitions.
+- `backend/contracts/phase2/openapi-draft.yaml` – Phase 2 Sprint-0 draft contract extensions.
 - `backend/database/migrations` – SQL migration scaffolding and baseline schema.
 - `shared/domain` – Shared domain entities (`Organization`, `Site`, `User`, `Obligation`, `Incident`, `CorrectiveAction`).
 - `frontend/web` – Front-end app shell.
