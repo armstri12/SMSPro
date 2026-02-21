@@ -1,17 +1,12 @@
 # Frontend Web
 
-UI shell for SMSPro dashboards and workflows.
+Phase 1 dashboard shell package.
 
-## Program workflow hooks
+## Development
 
-`src/programDocumentsApi.ts` includes API hooks for:
+```bash
+npm run dev
+```
 
-- Generate/re-generate program documents.
-- Submit revisions for review and capture approvals.
-- Export PDF packs for inspection, leadership, and legal review.
-
-## Operations + insights dashboard shell (Phase 1)
-
-- `src/operationsApi.ts`: incident/corrective action workflow APIs.
-- `src/insightsApi.ts`: KPI summary and Phase 1 compliance PDF export API.
-- `src/phase1DashboardShell.ts`: persistent sidebar + top bar + KPI cards + operational table shell with status and due-date indicators.
+The dashboard tries to read live insights data from `http://127.0.0.1:4105/v1/insights/dashboard?siteId=demo-site`.
+If the insights API is unavailable, the page falls back to mocked KPI data so UI development can continue.
