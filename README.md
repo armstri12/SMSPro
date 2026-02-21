@@ -14,29 +14,28 @@ Monorepo scaffold for the SMSPro MVP described in `docs/smspro-e2e-scope-and-des
 - `shared/domain` – Shared domain entities (`Organization`, `Site`, `User`, `Obligation`, `Incident`, `CorrectiveAction`).
 - `frontend/web` – Front-end app shell.
 
-## Quick start
+## Phase 1 close-out command surface
 
-1. Verify API contract YAML parses:
+```bash
+npm run dev
+npm run build
+npm run typecheck
+npm run test
+npm run test:smoke
+```
 
-   ```bash
-   npm run lint:contracts
-   ```
+## Local DB stack
 
-2. Verify baseline migration exists:
+```bash
+npm run db:up
+npm run db:reset
+npm run db:seed
+```
 
-   ```bash
-   npm run check:schema
-   ```
-
-3. Apply baseline schema to PostgreSQL:
-
-   ```bash
-   export DATABASE_URL='postgresql://user:pass@localhost:5432/smspro'
-   psql "$DATABASE_URL" -f backend/database/migrations/0001_baseline.sql
-   ```
+Default DB URL used by scripts is `postgresql://smspro:smspro@localhost:5432/smspro`.
 
 ## Notes
 
-- This commit focuses on module boundaries, contracts, and schema scaffolding for Phase 1.
-- Implementation code for service handlers and front-end views can be added independently in each package.
-- Execution planning reference: `docs/phase1-exit-and-phase2-sprint0-plan.md`.
+- `npm run dev` starts all five backend service stubs plus the frontend dashboard server.
+- Each backend service exposes `/health` for basic liveness checks.
+- `npm run test:smoke` launches service stubs and validates one happy-path endpoint per Phase 1 module against expected response shape.
